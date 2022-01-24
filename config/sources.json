@@ -1,1 +1,3 @@
-{}
+{
+	"INSA": "http://edt.insa-rennes.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=${resources}&projectId=${project}&calType=ical&firstDate=${start}&lastDate=${end}"
+}
