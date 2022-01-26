@@ -54,6 +54,18 @@ class CalendarObject :
 	def getObjects(self) -> "list[CalendarObject]":
 		return self._objects
 	
+	def getStates(self) :
+		return {
+			obj.getProperty('UID'): (
+				hash(obj), 
+				obj.getProperty('DTSTART'), 
+				obj.getProperty('DTEND'), 
+				obj.getProperty('SUMMARY'), 
+				obj.getPropertyOrDefault('LOCATION')
+			)
+			for obj in self.getObjects()
+		}
+
 	def getType(self) :
 		return self._type
 	
