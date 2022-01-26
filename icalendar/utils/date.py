@@ -19,12 +19,7 @@ class AdeDate :
 		return AdeDate(d)
 	
 	def today(delta=0) :
-		d = date.today()
-		if delta > 0 :
-			d = d + timedelta(days=delta)
-		elif delta < 0 :
-			d = d - timedelta(days=(-1*delta))
-		return AdeDate(d)
+		return AdeDate(today(delta))
 	
 	def startAndEndOfWeek() -> tuple :
 		d = date.today()
@@ -32,6 +27,18 @@ class AdeDate :
 		end = start + timedelta(days=6)
 		return (AdeDate(start), AdeDate(end))
 
+
+def today(delta=0) -> date :
+	d = date.today()
+	if delta > 0 :
+		d = d + timedelta(days=delta)
+	elif delta < 0 :
+		d = d - timedelta(days=(-1*delta))
+	return d
+
+
+def currentWeek(delta=0) -> str :
+	return today(delta).strftime('%Y-%V')
 
 
 def stringToDatetime(t: str) -> datetime :
