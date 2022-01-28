@@ -53,5 +53,11 @@ def utc_to_local(utc_dt: datetime) -> datetime :
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
 
-def formatDatetime(d: str) -> str:
+def formatDatetime(d: str) -> str :
 	return datetimeToString(utc_to_local(stringToDatetime(d))) 
+
+def formatTimedelta(td: float) -> str :
+	td_sec = int(td)
+	hours = td_sec // 3600
+	minutes = str((td_sec % 3600) // 60).rjust(2, '0')
+	return f"{hours}:{minutes}"
