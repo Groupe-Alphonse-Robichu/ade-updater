@@ -19,7 +19,7 @@ class CalendarConf :
 			'start': start,
 			'end': end,
 			'project': self._group['project_id'],
-			'resources': [*self._group['resources'], *self._cal['resources']]
+			'resources': ",".join([str(i) for i in {*self._group['resources'], *self._cal['resources']}])
 		}
 		return self._url_template.substitute(url_data)
 	
@@ -27,6 +27,13 @@ class CalendarConf :
 		ical = CalendarObject.fromUrl(self._getUrl(start, end))
 		no_translate = filterAndTranslate(self._fullname, self._group, ical)
 		return ical, no_translate
+	
+	def getStart(self) -> str:
+		return self._group['start']
+	
+	def getEnd(self) -> str :
+		end = self._group['limit']
+		return end if end is not None else str(AdeDate.fromString(self._group['start']).addDays(180))
 	
 	def getNotify(self) -> str :
 		return self._cal['notify']
