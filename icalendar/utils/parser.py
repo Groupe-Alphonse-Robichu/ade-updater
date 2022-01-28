@@ -1,7 +1,12 @@
-import requests
-import hashlib
+
 from collections import deque
 from collections.abc import Iterable
+
+import requests
+import hashlib
+import logging 
+
+logger = logging.getLogger(__name__)
 
 
 class CalendarObject :
@@ -92,6 +97,7 @@ class CalendarObject :
 		return prop_hash.hexdigest()
 	
 	def fromUrl(url: str) :
+		logger.info(f"REQUEST to {url}")
 		r = requests.get(url)
 		lines: list = r.content.decode('utf8').replace('\r', '').strip().split('\n')
 		lines.reverse()
