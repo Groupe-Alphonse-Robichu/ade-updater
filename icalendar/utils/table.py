@@ -8,7 +8,7 @@ def realCentre(s: str, size: int) :
 def createTable(ll: "list[list]", title=None) -> "list[str]" :
 	res = []
 	maxlen = max([len(l) for l in ll], default=0)
-	ll = [l + ([''] * (maxlen - len(l))) for l in ll]
+	ll = [[str(e) for e in l] + ([''] * (maxlen - len(l))) for l in ll]
 	max_col = [max([len(l[i]) for l in ll]) for i in range(maxlen)]
 	sep = "+" + "+".join(['-' * (c+2) for c in max_col]) + "+"
 	if title is not None :
