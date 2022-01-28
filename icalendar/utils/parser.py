@@ -55,6 +55,12 @@ class CalendarObject :
 	def alterObjects(self, func: callable) :
 		for obj in self._objects :
 			func(obj)
+	
+	def accumulate(self, func: callable, accumulator) :
+		res = accumulator
+		for obj in self._objects :
+			res = func(obj, res)
+		return res
 
 	def getObjects(self) -> "list[CalendarObject]":
 		return self._objects
