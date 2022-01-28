@@ -74,7 +74,8 @@ class CalendarObject :
 		for obj in self._objects :
 			obj.write(f)
 		for k, v in self._properties.items() :
-			line = f"{k}:{v.replace('\n', '\\n')}"
+			clean_v = v.replace('\n', '\\n')
+			line = f"{k}:{clean_v}"
 			while len(line) > 0 :
 				if len(line) > 73 :
 					f.write(f"{line[:73]}\n")
