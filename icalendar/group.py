@@ -1,6 +1,7 @@
 
 from icalendar.cal import CalendarConf
 from icalendar.notifiers.base import BaseNotifier
+from icalendar.utils.date import AdeDate
 
 
 class GroupConf :
@@ -13,7 +14,13 @@ class GroupConf :
 		return self._name
 	
 	def getData(self) :
-		return self._data
+		return self._group
+	
+	def getDestDir(self) -> str :
+		return self._group['dest_folder']
+	
+	def isPastLimit(self) :
+		return AdeDate.today() >= AdeDate.fromString(self._group['limit'])
 
 	def getCalendar(self, cal_name) :
 		return CalendarConf(cal_name, self._name, self._group)
@@ -27,7 +34,7 @@ class GroupConf :
 			cal = self.getCalendar(cal_name)
 			if states is not None :
 				if cal_name not in states :
-					states[cal_name] = []
+					states[cal_name] = {}
 				cal_states = states[cal_name]
 			else :
 				cal_states = None
