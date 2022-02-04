@@ -10,7 +10,7 @@ class BaseNotifier :
 	def discovered(self, channel, cal_name, event_counts) :
 		raise NotImplementedError
 	
-	def weekSchedule(self, channel, cal_name, events: "list[CalendarObject]") :
+	def weekSchedule(self, channel, cal_name, week, ical: CalendarObject) :
 		raise NotImplementedError
 	
 	def changes(self, channel, cal_name, insertions, deletions, modifications) :
