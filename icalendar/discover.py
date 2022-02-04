@@ -46,7 +46,7 @@ def discoverAllGroups(func: callable, notifier: BaseNotifier) :
 		sc, _ = group.forEach(func, notifier)
 		save_conf = save_conf or sc
 	
-	if sc :
+	if save_conf :
 		logger.info("SAVE live configuration")
 		saveJson(conf, CONF_FILE)
 
