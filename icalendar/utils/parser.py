@@ -5,6 +5,7 @@ from collections.abc import Iterable
 import requests
 import hashlib
 import logging 
+from io import StringIO
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ class CalendarObject :
 
 	def setProperty(self, property: str, value: str) :
 		if len(value) > 1 :
-			self._properties[property] = value.replace('\\n', '\n').strip()
+			self._properties[property] = value.replace('\\n', '\n').replace('\\,', ',').strip()
 
 	def hasProperty(self, property: str) -> bool :
 		return property in self._properties
@@ -26,7 +27,7 @@ class CalendarObject :
 	def getProperty(self, property: str) -> str :
 		return self._properties[property]
 
-	def getPropertyOrDefault(self, property, default="") :
+	def getPropertyOrDefault(self, property, default="") -> str:
 		if property in self._properties :
 			return self._properties[property]
 		return default
@@ -96,11 +97,17 @@ class CalendarObject :
 					line = ""
 		f.write(f'END:{self._type}\n')
 	
+	def getIcs(self) :
+		with StringIO() as f :
+			self.write(f)
+			return f.getvalue()
+		
+	
 	def __hash__(self) :
-		prop = self.getProperty('SUMMARY') + ":" + self.getProperty('DTSTART') + "-" + self.getProperty('DTEND') + "@" \
-				+ self.getPropertyOrDefault('LOCATION', '') + ":" + self.getPropertyOrDefault('DESCRIPTION', '') 
+		prop = self.getProperty('SUMMARY') + ":" + self.getProperty('DTSTART') + "-" + self.getProperty('DTEND') + "@" + self.getPropertyOrDefault('LOCATION')
 		prop_hash = hashlib.md5(prop.encode())
-		return prop_hash.hexdigest()
+		# return prop_hash.hexdigest()
+		return int.from_bytes(prop_hash.digest(), 'little')
 	
 	def fromUrl(url: str) :
 		logger.info(f"REQUEST to {url}")
@@ -146,14 +153,3 @@ def readObj(reader: deque, obj) -> CalendarObject :
 			else :
 				prop = p
 				current = t
-
-
-# def printEvent(evt) :
-# 	print(evt.getProperty('SUMMARY'))
-# 	print(formatDate(evt.getProperty('DTSTART')) + " - " + formatDate(evt.getProperty('DTEND')))
-# 	if evt.hasProperty("LOCATION") :
-# 		print(evt.getProperty('LOCATION'))
-# 	print(prettyLineReturn(evt.getProperty('DESCRIPTION')))
-
-# def prettyLineReturn(s: str) -> str :
-# 	return s.replace('\\n', '\n').strip()
