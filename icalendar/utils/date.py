@@ -3,28 +3,31 @@ from datetime import date, datetime, timezone, timedelta
 class AdeDate :
 
 	def __init__(self, d: date) :
-		self._date = d
+		self._dt = d
 	
 	def toDate(self) -> date :
-		return self._date
+		return self._dt
 	
 	def addDays(self, delta) :
 		return AdeDate(applyDelta(self._date, delta))
 
 	def __str__(self) -> str :
-		return self._date.strftime('%Y-%m-%d')
+		return self._dt.strftime('%Y-%m-%d')
+	
+	def __ge__(self, d) :
+		return self._dt >= (d.toDate())
 	
 	def getWeek(self) -> str :
-		return self._date.strftime('%Y-%V')
+		return self._dt.strftime('%Y-%V')
 	
 	def fromString(s: str) :
-		d = datetime.strptime(s, '%Y-%m-%d').date
+		d = datetime.strptime(s, '%Y-%m-%d').date()
 		return AdeDate(d)
 	
 	def today(delta=0) :
 		return AdeDate(applyDelta(date.today(), delta))
 	
-	def startAndEndOfWeek(delta=0) -> tuple :
+	def startAndEndOfWeek(delta=0) -> "tuple[AdeDate, AdeDate]" :
 		d = applyDelta(date.today(), delta)
 		start = d - timedelta(days=d.weekday())
 		end = start + timedelta(days=6)
