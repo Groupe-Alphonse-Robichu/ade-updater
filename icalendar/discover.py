@@ -27,6 +27,7 @@ def discoverAccumulator(obj: CalendarObject, events) :
 
 def discoverAll(conf: CalendarConf, notifier: BaseNotifier, _states) :
 	ical, no_translate = conf.fetchIcal(conf.getStart(), conf.getEnd())
+	conf.saveIcal(ical, None)
 	notifier.discovered(conf._cal['notify'], conf.getFullName(), ical.accumulate(discoverAccumulator, {}))
 	return False, False, no_translate
 

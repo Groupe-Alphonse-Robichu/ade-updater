@@ -34,7 +34,10 @@ class CalendarConf :
 		dest_folder = os.path.join(self._group['dest_folder'], self._name)
 		if not os.path.exists(dest_folder) :
 			os.mkdir(dest_folder)
-		dest_file = os.path.join(dest_folder, f"{week_begin} AdeCal.ics")
+		if week_begin is None :
+			dest_file = os.path.join(dest_folder, 'AdeCal.ics')
+		else :
+			dest_file = os.path.join(dest_folder, f"{week_begin} AdeCal.ics")
 		with open(dest_file, 'w') as f :
 			ical.write(f)
 	
