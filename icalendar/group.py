@@ -47,6 +47,6 @@ class GroupConf :
 			save_conf = True
 			for elt in no_translate :
 				self._group['translate'][elt] = None
-			notifier.missingTranslation(self._group['alert'], self._name, no_translate)
+			notifier.missingTranslation(self, no_translate)
 
 		return save_conf, save_states 

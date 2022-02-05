@@ -1,12 +1,11 @@
 from icalendar import loadJson, saveJson, CONF_FILE
 from icalendar.cal import CalendarConf
 from icalendar.group import GroupConf
-
-import logging
 from icalendar.notifiers.base import BaseNotifier
-
 from icalendar.utils.date import AdeDate, stringToDatetime
 from icalendar.utils.parser import CalendarObject
+
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +25,14 @@ def discoverAccumulator(obj: CalendarObject, events) :
 
 
 def discoverAll(conf: CalendarConf, notifier: BaseNotifier, _states) :
-	ical, no_translate = conf.fetchIcal(conf.getStart(), conf.getEnd())
-	conf.saveIcal(ical, None)
-	notifier.discovered(conf._cal['notify'], conf.getFullName(), ical.accumulate(discoverAccumulator, {}))
-	return False, False, no_translate
+	return discoverBetweenDates(conf, notifier, conf.getStart(), conf.getEnd())
 
 def discoverRemaining(conf: CalendarConf, notifier: BaseNotifier, _states) :
-	ical, no_translate = conf.fetchIcal(str(AdeDate.today()), conf.getEnd())
-	notifier.discovered(conf._cal['notify'], conf.getFullName(), ical.accumulate(discoverAccumulator, {}))
+	return discoverBetweenDates(conf, notifier, str(AdeDate.today()), conf.getEnd())
+
+def discoverBetweenDates(conf: CalendarConf, notifier: BaseNotifier, begin, end) :
+	ical, no_translate = conf.fetchIcal(begin, end)
+	notifier.discovered(conf, ical.accumulate(discoverAccumulator, {}), begin, end)
 	return False, False, no_translate
 
 

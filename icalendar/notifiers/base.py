@@ -1,17 +1,22 @@
 
+from icalendar.cal import CalendarConf
+from icalendar.group import GroupConf
 from icalendar.utils.parser import CalendarObject
 
 
 class BaseNotifier :
 
-	def missingTranslation(self, channel, group_name, summaries) :
+	def missingTranslation(self, group: GroupConf, summaries) :
 		raise NotImplementedError
 
-	def discovered(self, channel, cal_name, event_counts) :
+	def archive(self, group: GroupConf) :
+		raise NotImplementedError
+
+	def discovered(self, cal: CalendarConf, event_counts, begin, end) :
 		raise NotImplementedError
 	
-	def weekSchedule(self, channel, cal_name, week, ical: CalendarObject) :
+	def weekSchedule(self, cal: CalendarConf, ical: CalendarObject) :
 		raise NotImplementedError
 	
-	def changes(self, channel, cal_name, insertions, deletions, modifications) :
+	def changes(self, cal: CalendarConf, insertions, deletions, modifications) :
 		raise NotImplementedError

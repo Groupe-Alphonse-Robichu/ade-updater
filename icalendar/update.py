@@ -38,7 +38,7 @@ def updateCal(conf: CalendarConf, notifier: BaseNotifier, states: dict) :
 		conf.setUpdate()
 		states.clear()
 		states.update(new_states)
-		notifier.weekSchedule(conf.getNotify(), conf.getFullName(), conf.getWeek(), ical)
+		notifier.weekSchedule(conf, ical)
 		conf.saveIcal(ical, start)
 		return True, True, no_translate
 	else :
@@ -48,7 +48,7 @@ def updateCal(conf: CalendarConf, notifier: BaseNotifier, states: dict) :
 			states.clear()
 			states.update(new_states)
 			conf.setUpdate()
-			notifier.changes(conf.getNotify(), conf.getFullName(), add, rem, mod)
+			notifier.changes(conf, add, rem, mod)
 			return True, True, no_translate
 		return len(no_translate) > 0, False, no_translate
 
