@@ -1,5 +1,14 @@
 # ade-updater
 
+## How to install
+
+Simply `git clone` this repository, `cd` at the root of the repository and install the requirements :
+```
+$ pip3 install -r requirements.txt
+```
+
+Make sure your version of Python is 3.6 or above.
+
 ## How to use
 
 ```
