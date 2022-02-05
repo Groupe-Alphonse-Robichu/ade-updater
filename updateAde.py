@@ -1,16 +1,62 @@
 #!/usr/bin/python3
-from icalendar.discover import discoverAll, discoverAllGroups
+from icalendar.discover import discoverAllGroups, discoverAll, discoverRemaining
 from icalendar.update import updateAllGroups
+from icalendar.creation import createCalendar, createCalendarGroup
 from icalendar.notifiers.terminal import TerminalNotifier
+from icalendar.notifiers.discord import DiscordNotifier
 
+import sys
 import logging
 
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
-notifier = TerminalNotifier()
+
+def help(exit_code=0) :
+	script_name = sys.argv[0]
+	print(f"usage : {script_name} --createGroup <group_name>")
+	print(f"        {script_name} --createCal <group_name> <cal_name>")
+	print(f"        {script_name} [-n] --update")
+	print(f"        {script_name} [-n] --all")
+	print(f"        {script_name} [-n] --remaining")
+	sys.exit(exit_code)
 
 
-# discoverAllGroups(discoverAll, notifier)
+if __name__ == '__main__' :
 
-updateAllGroups(notifier)
+	args = sys.argv[1:]
+
+	if len(args) > 0 and args[0] == '-n' :
+		args = args[1:]
+		notifier = TerminalNotifier()
+	else :
+		notifier = DiscordNotifier()
+	
+	if len(args) > 0 and args[0] in ['-h', '--help'] :
+		help(0)
+
+	if len(args) == 0 :
+		help(1)
+	
+	if args[0] == '--update' :
+		updateAllGroups(notifier)
+		sys.exit(0)
+	
+	if args[0] == '--all' :
+		discoverAllGroups(discoverAll, notifier)
+		sys.exit(0)
+	
+	if args[0] == '--remaining' :
+		discoverAllGroups(discoverRemaining, notifier)
+		sys.exit(0)
+	
+	if args[0] == '--createGroup' :
+		if len(args) < 2 :
+			help(1)
+		sys.exit(0 if createCalendarGroup(args[1]) else 1)
+		
+	
+	if args[0] == '--createCal' :
+		if len(args) < 3 :
+			help(1)
+		sys.exit(0 if createCalendar(args[1], args[2]) else 1)
 
