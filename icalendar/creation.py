@@ -18,7 +18,7 @@ def createCalendarGroup(name: str) -> bool :
 		'project_id': None,
 		'resources': [],
 		'dest_folder': None,
-		'start': str(AdeDate.today),
+		'start': str(AdeDate.today()),
 		'limit': None,
 		'alert': None,
 		'ignore': [],
