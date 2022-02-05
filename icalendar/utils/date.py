@@ -1,4 +1,8 @@
 from datetime import date, datetime, timezone, timedelta
+from babel.dates import format_datetime
+
+DATE_LOCALE = 'fr_FR'
+
 
 class AdeDate :
 
@@ -10,12 +14,15 @@ class AdeDate :
 	
 	def addDays(self, delta) :
 		return AdeDate(applyDelta(self._date, delta))
+	
+	def format(self, fmt='%d/%m/%Y') :
+		return self._dt.strftime(fmt)
 
 	def __str__(self) -> str :
 		return self._dt.strftime('%Y-%m-%d')
 	
 	def __ge__(self, d) :
-		return self._dt >= (d.toDate())
+		return self._dt >= d._dt
 	
 	def getWeek(self) -> str :
 		return self._dt.strftime('%Y-%V')
@@ -46,18 +53,31 @@ def currentWeek(delta=0) -> str :
 	return AdeDate.today(delta).getWeek()
 
 
-def stringToDatetime(t: str) -> datetime :
-	return datetime.strptime(t,'%Y%m%dT%H%M%SZ')
+class IcalDate :
 
-def datetimeToString(d: datetime) -> str :
-	return d.strftime('%d/%m/%Y %Hh%M')
+	def __init__(self, t: str, clear_tz=True) :
+		self._dt = datetime.strptime(t,'%Y%m%dT%H%M%SZ')
+		if clear_tz :
+			self._dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+	
+	def toDatetime(self) :
+		return self._dt
+	
+	def formatDate(self) :
+		return format_datetime(self._dt, 'EEEE dd/MM/YYYY', locale=DATE_LOCALE).capitalize()
+	
+	def formatTime(self) :
+		return self._dt.strftime('%H:%M')
+	
+	def splitDatetime(self) :
+		return self.formatDate(), self.formatTime()
+	
+	def __sub__(self, idt) -> timedelta :
+		return self._dt - idt._dt
+	
+	def __str__(self) :
+		return self._dt.strftime('%d/%m/%Y %Hh%M')
 
-def utc_to_local(utc_dt: datetime) -> datetime :
-    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
-
-
-def formatDatetime(d: str) -> str :
-	return datetimeToString(utc_to_local(stringToDatetime(d))) 
 
 def formatTimedelta(td: float) -> str :
 	td_sec = int(td)

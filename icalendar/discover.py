@@ -2,7 +2,7 @@ from icalendar import loadJson, saveJson, CONF_FILE
 from icalendar.cal import CalendarConf
 from icalendar.group import GroupConf
 from icalendar.notifiers.base import BaseNotifier
-from icalendar.utils.date import AdeDate, stringToDatetime
+from icalendar.utils.date import AdeDate, IcalDate
 from icalendar.utils.parser import CalendarObject
 
 import logging
@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 def discoverAccumulator(obj: CalendarObject, events) :
 	summary = obj.getProperty('SUMMARY')
-	start = stringToDatetime(obj.getProperty('DTSTART'))
-	end = stringToDatetime(obj.getProperty('DTEND'))
+	start = IcalDate(obj.getProperty('DTSTART'))
+	end = IcalDate(obj.getProperty('DTEND'))
 	td = (end - start).total_seconds()
 	if summary not in events :
 		events[summary] = [1, td]

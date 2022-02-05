@@ -1,6 +1,7 @@
 
 from collections import deque
 from collections.abc import Iterable
+from typing import Iterator
 
 import requests
 import hashlib
@@ -38,11 +39,8 @@ class CalendarObject :
 	def _sortObjects(self) :
 		self._objects.sort(key = lambda evt : evt.getProperty('DTSTART'))
 
-	def addObject(self, obj):
-		if isinstance(obj, Iterable):
-			self._objects.extend(obj)
-		else :
-			self._objects.append(obj)
+	def addObject(self, obj: "CalendarObject") :
+		self._objects.append(obj)
 		self._sortObjects()
 	
 	def filterObjects(self, filter: callable) -> int :
@@ -62,9 +60,12 @@ class CalendarObject :
 		for obj in self._objects :
 			res = func(obj, res)
 		return res
+	
+	def hasObjects(self) :
+		return len(self._objects) > 0
 
-	def getObjects(self) -> "list[CalendarObject]":
-		return self._objects
+	def __iter__(self) -> "Iterator[CalendarObject]":
+		return iter(self._objects)
 	
 	def getStates(self) :
 		return {
@@ -75,7 +76,7 @@ class CalendarObject :
 				obj.getProperty('SUMMARY'), 
 				obj.getPropertyOrDefault('LOCATION')
 			)
-			for obj in self.getObjects()
+			for obj in self
 		}
 
 	def getType(self) :
@@ -130,7 +131,7 @@ def readIcs(reader: deque) -> CalendarObject :
 		return obj
 	raise SyntaxError('Incorrect beginning of .ics file')
 
-def readObj(reader: deque, obj) -> CalendarObject :
+def readObj(reader: deque, obj: CalendarObject) -> CalendarObject :
 	prop = None
 	current = None
 	while len(reader) > 0 :

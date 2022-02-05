@@ -18,6 +18,9 @@ class GroupConf :
 	def getDestDir(self) -> str :
 		return self._group['dest_folder']
 	
+	def getAlertChannel(self) :
+		return self._group['alert']
+	
 	def isPastLimit(self) :
 		return AdeDate.today() >= AdeDate.fromString(self._group['limit'])
 
@@ -43,6 +46,7 @@ class GroupConf :
 			no_translate.update(nt)
 
 		if len(no_translate) > 0 :
+			no_translate.sort()
 			save_conf = True
 			for elt in no_translate :
 				self._group['translate'][elt] = None

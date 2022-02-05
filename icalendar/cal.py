@@ -69,5 +69,8 @@ class CalendarConf :
 	def setUpdate(self) :
 		self._cal['update'] = str(AdeDate.today())
 	
+	def getUpdate(self) :
+		return self._cal['update']
+	
 	def getFullName(self) :
 		return self._fullname

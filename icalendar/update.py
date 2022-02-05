@@ -16,15 +16,15 @@ def _computeChanges(old_states: dict, new_states: dict) :
 	modified = []
 	for evt_id, evt_state in old_states.items() :
 		if evt_id not in new_states :
-			removed.append(evt_state)
+			removed.append(evt_state[1:])
 			logger.info(f"REMOVED event \"{evt_state[3]}\" ({evt_id})")
 		elif evt_state[0] != new_states[evt_id][0] :
 			logger.info(f"MODIFIED event \"{evt_state[3]}\" ({evt_id})")
-			modified.append(evt_state)
+			modified.append(evt_state[1:])
 	for evt_id, evt_state in new_states.items() :
 		if evt_id not in old_states :
 			logger.info(f"ADDED event \"{evt_state[3]}\" ({evt_id})")
-			added.append(evt_state)
+			added.append(evt_state[1:])
 	return added, removed, modified
 
 
@@ -38,7 +38,7 @@ def updateCal(conf: CalendarConf, notifier: BaseNotifier, states: dict) :
 		conf.setUpdate()
 		states.clear()
 		states.update(new_states)
-		notifier.weekSchedule(conf, ical)
+		notifier.weekSchedule(conf, ical, start)
 		conf.saveIcal(ical, start)
 		return True, True, no_translate
 	else :
@@ -47,8 +47,9 @@ def updateCal(conf: CalendarConf, notifier: BaseNotifier, states: dict) :
 		if len(add) + len(rem) + len(mod) > 0 :
 			states.clear()
 			states.update(new_states)
-			conf.setUpdate()
 			notifier.changes(conf, add, rem, mod)
+			conf.setUpdate()
+			conf.saveIcal(ical, start)
 			return True, True, no_translate
 		return len(no_translate) > 0, False, no_translate
 
