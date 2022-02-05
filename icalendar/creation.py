@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 def createCalendarGroup(name: str) -> bool :
 	data = loadJson(CONF_FILE)
+	if '/' in name :
+		logger.warning(f"INVALID calendar group name {name}")
 	if name in data :
 		logger.warning(f"EXISTS calendar group {name}")
 		return False
@@ -30,6 +32,8 @@ def createCalendarGroup(name: str) -> bool :
 
 def createCalendar(group: str, name: str) -> bool :
 	data = loadJson(CONF_FILE)
+	if '/' in name :
+		logger.warning(f"INVALID calendar name {name}")
 	if group not in data :
 		logger.warning(f"NOT_FOUND calendar group {group}")
 		return False

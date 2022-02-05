@@ -77,6 +77,7 @@ def updateAllGroups(notifier: BaseNotifier) :
 			del conf[group_name]
 		else :
 			if not os.path.exists(group.getDestDir()) :
+				logger.info(f"CREATING directory {group.getDestDir()}")
 				os.makedirs(group.getDestDir())
 			sc, ss = group.forEach(updateCal, notifier, states[group_name])
 			save_conf = save_conf or sc

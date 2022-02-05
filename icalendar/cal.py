@@ -4,6 +4,9 @@ from icalendar.utils.parser import CalendarObject
 from icalendar.utils.date import AdeDate, currentWeek
 
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CalendarConf :
@@ -33,11 +36,13 @@ class CalendarConf :
 	def saveIcal(self, ical: CalendarObject, week_begin: AdeDate) :
 		dest_folder = os.path.join(self._group['dest_folder'], self._name)
 		if not os.path.exists(dest_folder) :
+			logger.info(f"CREATING directory {dest_folder}")
 			os.mkdir(dest_folder)
 		if week_begin is None :
 			dest_file = os.path.join(dest_folder, 'AdeCal.ics')
 		else :
 			dest_file = os.path.join(dest_folder, f"{week_begin} AdeCal.ics")
+		logger.info(f"SAVING file {dest_file}")
 		with open(dest_file, 'w') as f :
 			ical.write(f)
 	
