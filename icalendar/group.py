@@ -1,6 +1,5 @@
 
 from icalendar.cal import CalendarConf
-from icalendar.notifiers.base import BaseNotifier
 from icalendar.utils.date import AdeDate
 
 
@@ -25,7 +24,7 @@ class GroupConf :
 	def getCalendar(self, cal_name) :
 		return CalendarConf(cal_name, self._name, self._group)
 	
-	def forEach(self, func, notifier: BaseNotifier, states=None) -> "tuple[bool, bool]" :
+	def forEach(self, func, notifier, states=None) -> "tuple[bool, bool]" :
 		save_conf = False
 		save_states = False
 		no_translate = set()
