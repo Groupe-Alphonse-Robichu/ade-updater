@@ -1,7 +1,15 @@
 from datetime import date, datetime, timezone, timedelta
 from babel.dates import format_datetime
 
-DATE_LOCALE = 'fr_FR'
+class DateConstants :
+
+	def __init__(self) :
+		raise TypeError("The constructor of the DateConstants class should not be called")
+	
+	TIMEZONE = None
+
+	LOCALE = 'fr_FR'
+
 
 
 class AdeDate :
@@ -58,13 +66,13 @@ class IcalDate :
 	def __init__(self, t: str, clear_tz=True) :
 		self._dt = datetime.strptime(t,'%Y%m%dT%H%M%SZ')
 		if clear_tz :
-			self._dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+			self._dt = self._dt.replace(tzinfo=timezone.utc).astimezone(tz=DateConstants.TIMEZONE)
 	
 	def toDatetime(self) :
 		return self._dt
 	
 	def formatDate(self) :
-		return format_datetime(self._dt, 'EEEE dd/MM/YYYY', locale=DATE_LOCALE).capitalize()
+		return format_datetime(self._dt, 'EEEE dd/MM/YYYY', locale=DateConstants.LOCALE).capitalize()
 	
 	def formatTime(self) :
 		return self._dt.strftime('%H:%M')
@@ -72,6 +80,9 @@ class IcalDate :
 	def splitDatetime(self) :
 		return self.formatDate(), self.formatTime()
 	
+	def getTimestamp(self) :
+		return int(datetime.timestamp(self._dt))
+
 	def __sub__(self, idt) -> timedelta :
 		return self._dt - idt._dt
 	
