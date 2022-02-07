@@ -69,11 +69,11 @@ class DiscordNotifier(BaseNotifier) :
 			logger.info(f"WEBHOOK failed for calendar {cal.getFullName()} with status code {response.status_code}")
 
 	
-	def changes(self, cal: CalendarConf, insertions, deletions, modifications) :
+	def changes(self, cal: CalendarConf, insertions: list, deletions: list, modifications: list) :
 		edits = {
 			"Nouveaux cours": ('3bf573', insertions),
 			"Cours supprimés": ('f53b3b', deletions),
-			"Cours modifiés": ('3b9bf5', modifications)
+			"Cours modifiés": ('3b9bf5', [m[1] for m in modifications])
 		}
 		message = f"Des modifications ont été détectées depuis le {AdeDate.fromString(cal.getUpdate()).format()}"
 		webhook = DiscordWebhook(url=cal.getNotify(), content=message)

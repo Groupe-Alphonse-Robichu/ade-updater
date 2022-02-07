@@ -20,7 +20,7 @@ def _computeChanges(old_states: dict, new_states: dict) :
 			logger.info(f"REMOVED event \"{evt_state[3]}\" ({evt_id})")
 		elif evt_state[0] != new_states[evt_id][0] :
 			logger.info(f"MODIFIED event \"{evt_state[3]}\" ({evt_id})")
-			modified.append(evt_state[1:])
+			modified.append((evt_state[1:], new_states[evt_id][1:]))
 	for evt_id, evt_state in new_states.items() :
 		if evt_id not in old_states :
 			logger.info(f"ADDED event \"{evt_state[3]}\" ({evt_id})")
