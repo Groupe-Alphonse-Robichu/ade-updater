@@ -41,6 +41,7 @@ Once this is done,  you can proceed to the configration of the calendar(s) via t
 		"start": "2022-01-28",
 		"limit": "2022-06-10",
 		"alert": "https/discord.com/api/webhooks/...",
+		"role_id": 12345,
 		"ignore": [],
 		"translate": {},
 		"calendars": {

@@ -21,6 +21,7 @@ def createCalendarGroup(name: str) -> bool :
 		'start': str(AdeDate.today()),
 		'limit': None,
 		'alert': None,
+		'role_id': None,
 		'ignore': [],
 		'translate': {},
 		'calendars': {}

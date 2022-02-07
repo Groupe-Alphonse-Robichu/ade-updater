@@ -56,6 +56,9 @@ class CalendarConf :
 	def getNotify(self) -> str :
 		return self._cal['notify']
 	
+	def getRoleId(self) :
+		return self._group['role_id']
+	
 	def weekChanged(self, delta=0) -> bool :
 		week = currentWeek(delta)
 		return self._cal['week'] != week

@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 
 PROJECT_URL = "https://github.com/Groupe-Alphonse-Robichu/ade-updater"
 
+def formatRole(role_id) :
+	return f"<@&{role_id}>"
+
+
 # The notifier may start to spam Discord servers a little when there are a lot of calendars.
 # Maybe add a delay betwenn each request ?
 
@@ -22,6 +26,9 @@ class DiscordNotifier(BaseNotifier) :
 
 	def missingTranslation(self, group: GroupConf, summaries: "list[str]") :
 		if len(summaries) == 0 :
+			return
+		if group.getAlertChannel() is None :
+			logger.warning(f"UNDEFINED alert channel for group {group.getName()}")
 			return
 		summ = deque(summaries)
 		message = 'The translations for the following events were not found : \n```\n'
@@ -34,11 +41,17 @@ class DiscordNotifier(BaseNotifier) :
 			message = '```\n'
 	
 	def archive(self, group: GroupConf) :
+		if group.getAlertChannel() is None :
+			logger.warning(f"UNDEFINED alert channel for group {group.getName()}")
+			return
 		webhook = DiscordWebhook(url=group.getAlertChannel(), content=f"Calendar group {group.getName()} has reached its limit date and will no longer be updated.")
 		webhook.execute()
 	
 	def weekSchedule(self, cal: CalendarConf, ical: CalendarObject, startOfWeek: AdeDate) :
 		if not ical.hasObjects() :
+			return
+		if cal.getNotify() is None :
+			logger.warning(f"UNDEFINED alert channel for calendar {cal.getFullName()}")
 			return
 		message = f"Voici l'emploi du temps de la semaine du {startOfWeek.format()}"
 		webhook = DiscordWebhook(url=cal.getNotify(), content=message)
@@ -70,13 +83,21 @@ class DiscordNotifier(BaseNotifier) :
 
 	
 	def changes(self, cal: CalendarConf, insertions: list, deletions: list, modifications: list) :
+		if cal.getNotify() is None :
+			logger.warning(f"UNDEFINED alert channel for calendar {cal.getFullName()}")
+			return
 		edits = {
 			"Nouveaux cours": ('3bf573', insertions),
 			"Cours supprimés": ('f53b3b', deletions),
 			"Cours modifiés": ('3b9bf5', [m[1] for m in modifications])
 		}
+		webhook = DiscordWebhook(url=cal.getNotify())
 		message = f"Des modifications ont été détectées depuis le {AdeDate.fromString(cal.getUpdate()).format()}"
-		webhook = DiscordWebhook(url=cal.getNotify(), content=message)
+		role_id = cal.getRoleId()
+		if role_id is not None :
+			message += " " + formatRole(role_id)
+			webhook.allowed_mentions={'roles': [str(role_id)]}
+		webhook.content=message
 		for title, content in edits.items() :
 			evt_states = content[1]
 			if len(evt_states) > 0 :
