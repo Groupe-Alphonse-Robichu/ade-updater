@@ -37,10 +37,10 @@ def createCalendar(group: str, name: str) -> bool :
 	if group not in data :
 		logger.warning(f"NOT_FOUND calendar group {group}")
 		return False
-	if name in data[group] :
+	if name in data[group]['calendars'] :
 		logger.warning(f"EXISTS calendar {name} in calendar group {group}")
 		return False
-	data[group][name] = {
+	data[group]['calendars'][name] = {
 		'resources': [],
 		'notify': None,
 		'update': 'never',
