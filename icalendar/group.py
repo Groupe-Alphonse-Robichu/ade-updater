@@ -50,6 +50,7 @@ class GroupConf :
 			save_conf = True
 			for elt in no_translate :
 				self._group['translate'][elt] = None
+			self._group['translate'] = dict(sorted(self._group['translate'].items()))
 			notifier.missingTranslation(self, no_translate)
 
 		return save_conf, save_states 
