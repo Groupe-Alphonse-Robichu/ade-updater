@@ -6,12 +6,11 @@ logger = logging.getLogger(__name__)
 
 
 def _cleanLocation(location: str) -> str :
-	loc = location.replace('*', ' ')   \
-			.replace('(V)', ' ')       \
-			.replace('(VPI)', ' ')     \
-			.replace(' ,', ',')        \
-			.strip()
-	return " ".join(loc.split())
+	loc = [
+		" ".join(l.replace('*', ' ').replace('(V)', ' ').replace('(VPI)', ' ').strip().split(' '))
+		for l in location.split(',')
+	]
+	return ", ".join(loc)
 
 def _objTranslate(translate, obj: CalendarObject, no_translate) :
 	if obj.hasProperty('LOCATION') :
