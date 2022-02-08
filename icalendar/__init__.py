@@ -22,6 +22,9 @@ def saveJson(data, path) :
 	with open(path, 'w') as f :
 		json.dump(data, f, indent='\t')
 
+if not os.path.exists(CONF_DIR) :
+	os.mkdir(CONF_DIR)
+
 for file, default in {CONF_FILE: {}, STATES_FILE: {}, SOURCES_FILE: {}, ARCHIVE_FILE:[]} :
 	if not os.path.exists(file) :
 		logger.info(f"CREATE file {file}")
