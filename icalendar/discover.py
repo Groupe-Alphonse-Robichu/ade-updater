@@ -24,19 +24,35 @@ def discoverAccumulator(obj: CalendarObject, events) :
 	return events
 
 
-def discoverAll(conf: CalendarConf, notifier: BaseNotifier, _states) :
-	return discoverBetweenDates(conf, notifier, conf.getStart(), conf.getEnd())
+def discoverAll(conf: CalendarConf, notifier: BaseNotifier, _states) -> "tuple[bool, bool, dict]":
+	nt, ical = discoverBetweenDates(conf, notifier, conf.getStart(), conf.getEnd())
+	conf.saveIcal(ical)
+	return False, False, nt
 
-def discoverRemaining(conf: CalendarConf, notifier: BaseNotifier, _states) :
-	return discoverBetweenDates(conf, notifier, str(AdeDate.today()), conf.getEnd())
+
+def discoverRemaining(conf: CalendarConf, notifier: BaseNotifier, _states) -> "tuple[bool, bool, dict]" :
+	nt, ical = discoverBetweenDates(conf, notifier, str(AdeDate.today()), conf.getEnd())
+	conf.saveIcal(ical)
+	return False, False, nt
 
 def discoverBetweenDates(conf: CalendarConf, notifier: BaseNotifier, begin, end) :
 	ical, no_translate = conf.fetchIcal(begin, end)
 	notifier.discovered(conf, ical.accumulate(discoverAccumulator, {}), begin, end)
-	return False, False, no_translate
+	return no_translate, ical
 
 
 
+# `func` is a callable that takes three arguments :
+#  - The configuration (`CalendarConf` object)
+#  - The notifier
+#  - The dict of states (in this case it will be `None`)
+# Yields a tuple of three elements :
+#  - A boolean indicating if the configuration must be saved (most likely `False`)
+#  - A boolean indicating if the states must be saved (always `False` in this case)
+#  - The list of names that couldn't be translated
+#
+# Note : if the first boolean yielded by `func` is `False` but there are names 
+# that couldn't be translated, the configuration will be saved anyways
 def discoverAllGroups(func: callable, notifier: BaseNotifier) :
 	conf = loadJson(CONF_FILE)
 	save_conf = False

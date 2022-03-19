@@ -84,6 +84,16 @@ class DiscordNotifier(BaseNotifier) :
 		else :
 			logger.info(f"WEBHOOK failed for calendar {cal.getFullName()} with status code {response.status_code}")
 
+	def _recent_modifications(self, insertions: list, deletions: list, modifications: list) -> bool :
+		now = IcalDate.today()
+		for evt_list in [insertions, deletions, [evt for _, evt in modifications]] :
+			for evt in evt_list :
+				if now < IcalDate(evt[0]) :
+					return True
+		return False
+		
+
+
 	
 	def changes(self, cal: CalendarConf, insertions: list, deletions: list, modifications: list) :
 		if cal.getNotify() is None :
@@ -96,7 +106,7 @@ class DiscordNotifier(BaseNotifier) :
 		webhook = DiscordWebhook(url=cal.getNotify())
 		message = f"Des modifications ont été détectées depuis le {AdeDate.fromString(cal.getUpdate()).format()}"
 		role_id = cal.getRoleId()
-		if role_id is not None :
+		if role_id is not None and self._recent_modifications(insertions, deletions, modifications):
 			message += " " + formatRole(role_id)
 			webhook.allowed_mentions={'roles': [str(role_id)]}
 		webhook.content=message

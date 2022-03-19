@@ -28,7 +28,7 @@ def _computeChanges(old_states: dict, new_states: dict) :
 	return added, removed, modified
 
 
-def updateCal(conf: CalendarConf, notifier: BaseNotifier, states: dict) :
+def updateCal(conf: CalendarConf, notifier: BaseNotifier, states: dict) -> "tuple[bool, bool, dict]" :
 	start, end = AdeDate.startAndEndOfWeek(2)
 	ical, no_translate = conf.fetchIcal(start, end)
 	new_states = ical.getStates()

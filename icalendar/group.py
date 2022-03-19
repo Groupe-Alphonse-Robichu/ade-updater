@@ -27,6 +27,21 @@ class GroupConf :
 	def getCalendar(self, cal_name) :
 		return CalendarConf(cal_name, self._name, self._group)
 	
+	# func is a callable that takes three arguments :
+	#  - The configuration (`CalendarConf` object)
+	#  - The notifier
+	#  - The dict of states
+	# Yields a tuple of three elements :
+	#  - A boolean indicating if the configuration must be saved
+	#  - A boolean indicating if the states must be saved
+	#  - The list of names that couldn't be translated
+	#
+	# Retruns a tuple of booleans :
+	#  - Indicating if the configuration must be saved
+	#  - Indicating if the states must be saved
+	#
+	# Note : if the first boolean yielded by `func` is `False` but there are names 
+	# that couldn't be translated, the configuration will be saved anyways
 	def forEach(self, func, notifier, states=None) -> "tuple[bool, bool]" :
 		save_conf = False
 		save_states = False
