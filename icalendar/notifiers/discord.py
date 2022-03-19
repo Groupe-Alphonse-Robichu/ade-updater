@@ -17,9 +17,23 @@ PROJECT_URL = "https://github.com/Groupe-Alphonse-Robichu/ade-updater"
 def formatRole(role_id) :
 	return f"<@&{role_id}>"
 
+def formatDate(dt: IcalDate) -> str :
+	return f"<t:{dt.getTimestamp()}:d>"
+
+def formatLongDate(dt: IcalDate) -> str :
+	return f"<t:{dt.getTimestamp()}:D>"
+
+def formatTime(dt: IcalDate) -> str :
+	return f"<t:{dt.getTimestamp()}:t>"
+
 def formatTimeRange(evt) :
-	date, time1 = IcalDate(evt[0]).splitDatetime()
-	time2 = IcalDate(evt[1]).formatTime()
+	dt1 = IcalDate(evt[0])
+	dt2 = IcalDate(evt[1])
+	date = formatDate(dt1)
+	time1 = formatTime(dt1)
+	time2 = formatTime(dt2)
+	# date, time1 = IcalDate(evt[0]).fixTimezone().splitDatetime()
+	# time2 = IcalDate(evt[1]).fixTimezone().formatTime()
 	return date, f"{time1} - {time2}"
 
 # The notifier may start to spam Discord servers a little when there are a lot of calendars.
@@ -61,17 +75,17 @@ class DiscordNotifier(BaseNotifier) :
 		days = {}
 		for obj in ical :
 			startDate = IcalDate(obj.getProperty('DTSTART'))
-			date, time = startDate.splitDatetime()
+			date = startDate.getDate()
 			if date not in days : 
-				days[date] = []
-			days[date].append((
+				days[date] = formatLongDate(startDate), []
+			days[date][1].append((
 				obj.getProperty('SUMMARY'),
-				time,
-				IcalDate(obj.getProperty('DTEND')).formatTime(),
+				formatTime(startDate),
+				formatTime(IcalDate(obj.getProperty('DTEND'))),
 				obj.getPropertyOrDefault('LOCATION')
 			))
-		for day, events in days.items() :
-			embed = DiscordEmbed(title=day, color='9b40e6')
+		for date, events in days.values() :
+			embed = DiscordEmbed(title=date, color='9b40e6')
 			for evt in events :
 				desc = f"{evt[1]} - {evt[2]}" + (f"\n{evt[3]}" if len(evt[3]) > 0 else "")
 				embed.add_embed_field(name=evt[0], value=desc)
@@ -85,16 +99,13 @@ class DiscordNotifier(BaseNotifier) :
 			logger.info(f"WEBHOOK failed for calendar {cal.getFullName()} with status code {response.status_code}")
 
 	def _recent_modifications(self, insertions: list, deletions: list, modifications: list) -> bool :
-		now = IcalDate.today()
+		now = IcalDate.today().format()
 		for evt_list in [insertions, deletions, [evt for _, evt in modifications]] :
 			for evt in evt_list :
-				if now < IcalDate(evt[0]) :
+				if now < evt[0] :
 					return True
 		return False
 		
-
-
-	
 	def changes(self, cal: CalendarConf, insertions: list, deletions: list, modifications: list) :
 		if cal.getNotify() is None :
 			logger.warning(f"UNDEFINED alert channel for calendar {cal.getFullName()}")

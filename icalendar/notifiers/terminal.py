@@ -4,7 +4,7 @@ from icalendar.group import GroupConf
 from icalendar.notifiers.base import BaseNotifier
 from icalendar.utils.table import printTable
 from icalendar.utils.parser import CalendarObject
-from icalendar.utils.date import AdeDate, IcalDate, formatTimedelta
+from icalendar.utils.date import AdeDate, IcalDate
 
 import logging
 
