@@ -58,7 +58,7 @@ class AdeDate :
 		return (AdeDate(start), AdeDate(end))
 
 
-def applyDelta(d, delta=0) -> date :
+def applyDelta(d: date, delta=0) -> date :
 	if delta > 0 :
 		return d + timedelta(days=delta)
 	elif delta < 0 :
@@ -72,16 +72,25 @@ def currentWeek(delta=0) -> str :
 
 class IcalDate :
 
-	def __init__(self, t: str, clear_tz=True) :
-		self._dt = datetime.strptime(t,'%Y%m%dT%H%M%SZ')
-		if clear_tz :
+	def __init__(self, t: "str | datetime", fix_tz=True) :
+		self._dt = datetime.strptime(t,'%Y%m%dT%H%M%SZ') if type(t) == str else t
+		if fix_tz :
 			self._dt = self._dt.replace(tzinfo=timezone.utc).astimezone(tz=DateConstants.TIMEZONE)
 
 	def today(delta=0) -> "IcalDate" :
-		return IcalDate(applyDelta(date.today(), delta))
+		return IcalDate(applyDelta(datetime.today(), delta), fix_tz=False)
 	
 	def toDatetime(self) :
 		return self._dt
+	
+	def getDate(self) -> str:
+		return self._dt.strftime('%m/%d/%Y')
+	
+	def getTimestamp(self) -> int :
+		return int(self._dt.timestamp())
+
+	def format(self) :
+		return self._dt.strftime('%Y%m%dT%H%M%SZ')
 	
 	def formatDate(self) :
 		return format_datetime(self._dt, 'EEEE dd/MM/YYYY', locale=DateConstants.LOCALE).capitalize()
@@ -100,18 +109,6 @@ class IcalDate :
 	
 	def __str__(self) :
 		return self._dt.strftime('%d/%m/%Y %Hh%M')
-	
-	def __ge__(self, d: "IcalDate") -> bool :
-		return self._dt >= d._dt
-
-	def __gt__(self, d: "IcalDate") -> bool :
-		return self._dt > d._dt
-
-	def __le__(self, d: "IcalDate") -> bool :
-		return self._dt <= d._dt
-
-	def __lt__(self, d: "IcalDate") -> bool :
-		return self._dt < d._dt
 
 
 def formatTimedelta(td: float) -> str :
