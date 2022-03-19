@@ -20,7 +20,7 @@ class AdeDate :
 	def toDate(self) -> date :
 		return self._dt
 	
-	def addDays(self, delta) :
+	def addDays(self, delta) -> "AdeDate" :
 		return AdeDate(applyDelta(self._date, delta))
 	
 	def format(self, fmt='%d/%m/%Y') :
@@ -29,17 +29,26 @@ class AdeDate :
 	def __str__(self) -> str :
 		return self._dt.strftime('%Y-%m-%d')
 	
-	def __ge__(self, d) :
+	def __ge__(self, d: "AdeDate") -> bool :
 		return self._dt >= d._dt
+
+	def __gt__(self, d: "AdeDate") -> bool :
+		return self._dt > d._dt
+
+	def __le__(self, d: "AdeDate") -> bool :
+		return self._dt <= d._dt
+
+	def __lt__(self, d: "AdeDate") -> bool :
+		return self._dt < d._dt
 	
 	def getWeek(self) -> str :
 		return self._dt.strftime('%Y-%V')
 	
-	def fromString(s: str) :
+	def fromString(s: str) -> "AdeDate" :
 		d = datetime.strptime(s, '%Y-%m-%d').date()
 		return AdeDate(d)
 	
-	def today(delta=0) :
+	def today(delta=0) -> "AdeDate" :
 		return AdeDate(applyDelta(date.today(), delta))
 	
 	def startAndEndOfWeek(delta=0) -> "tuple[AdeDate, AdeDate]" :
@@ -67,6 +76,9 @@ class IcalDate :
 		self._dt = datetime.strptime(t,'%Y%m%dT%H%M%SZ')
 		if clear_tz :
 			self._dt = self._dt.replace(tzinfo=timezone.utc).astimezone(tz=DateConstants.TIMEZONE)
+
+	def today(delta=0) -> "IcalDate" :
+		return IcalDate(applyDelta(date.today(), delta))
 	
 	def toDatetime(self) :
 		return self._dt
@@ -88,6 +100,18 @@ class IcalDate :
 	
 	def __str__(self) :
 		return self._dt.strftime('%d/%m/%Y %Hh%M')
+	
+	def __ge__(self, d: "IcalDate") -> bool :
+		return self._dt >= d._dt
+
+	def __gt__(self, d: "IcalDate") -> bool :
+		return self._dt > d._dt
+
+	def __le__(self, d: "IcalDate") -> bool :
+		return self._dt <= d._dt
+
+	def __lt__(self, d: "IcalDate") -> bool :
+		return self._dt < d._dt
 
 
 def formatTimedelta(td: float) -> str :
