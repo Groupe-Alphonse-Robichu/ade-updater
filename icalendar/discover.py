@@ -26,13 +26,13 @@ def discoverAccumulator(obj: CalendarObject, events) :
 
 def discoverAll(conf: CalendarConf, notifier: BaseNotifier, _states) -> "tuple[bool, bool, dict]":
 	nt, ical = discoverBetweenDates(conf, notifier, conf.getStart(), conf.getEnd())
-	conf.saveIcal(ical)
+	conf.saveIcal(ical, None)
 	return False, False, nt
 
 
 def discoverRemaining(conf: CalendarConf, notifier: BaseNotifier, _states) -> "tuple[bool, bool, dict]" :
 	nt, ical = discoverBetweenDates(conf, notifier, str(AdeDate.today()), conf.getEnd())
-	conf.saveIcal(ical)
+	conf.saveIcal(ical, "remaining")
 	return False, False, nt
 
 def discoverBetweenDates(conf: CalendarConf, notifier: BaseNotifier, begin, end) :
