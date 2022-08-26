@@ -69,7 +69,7 @@ def updateAllGroups(notifier: BaseNotifier) :
 	save_conf = False
 	save_states = False
 
-	for group_name, group_data in conf.items() :
+	for group_name, group_data in list(conf.items()) :
 		if group_name not in states :
 			states[group_name] = {}
 		group = GroupConf(group_name, group_data)
