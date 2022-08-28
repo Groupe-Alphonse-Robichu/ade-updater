@@ -35,7 +35,7 @@ class CalendarConf :
 		return self._group
 
 	def fetchIcal(self, start: AdeDate, end: AdeDate) -> "tuple[CalendarObject, list[str]]" :
-		ical = CalendarObject.fromUrl(self._source.getURL(start, end))
+		ical = self._source.fetchIcal(start, end)
 		no_translate = filterAndTranslate(self, ical)
 		return ical, no_translate
 	

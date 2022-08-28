@@ -83,6 +83,9 @@ class IcalDate :
 	def toDatetime(self) :
 		return self._dt
 	
+	def toAdeDate(self) :
+		return AdeDate(self._dt.date())
+	
 	def getDate(self) -> str:
 		return self._dt.strftime('%m/%d/%Y')
 	

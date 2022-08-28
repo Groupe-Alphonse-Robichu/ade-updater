@@ -1,12 +1,13 @@
 
+from icalendar.utils.date import IcalDate
+
 from collections import deque
-from collections.abc import Iterable
 from typing import Iterator
+from io import StringIO
 
 import requests
 import hashlib
 import logging 
-from io import StringIO
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +87,16 @@ class CalendarObject :
 	def getType(self) :
 		return self._type
 	
+	def getStartDate(self) -> IcalDate :
+		if self.hasProperty('DTSTART') :
+			return IcalDate(self.getProperty('DTSTART'))
+		return None
+	
+	def getEndDate(self) -> IcalDate :
+		if self.hasProperty('DTEND') :
+			return IcalDate(self.getProperty('DTEND'))
+		return None
+	
 	def write(self, f):
 		f.write(f"BEGIN:{self._type}\n")
 		for obj in self._objects :
@@ -123,7 +134,7 @@ class CalendarObject :
 
 
 def splitLine(line: str) :
-	res = line.split(':', 2)
+	res = line.split(':', 1)
 	return (res[0], res[1])
 
 def readIcs(reader: deque) -> CalendarObject :

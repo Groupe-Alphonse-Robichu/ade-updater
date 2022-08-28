@@ -12,6 +12,9 @@ class CalendarSource :
 
 	def getURL(self, begin: AdeDate, end: AdeDate) -> str :
 		raise NotImplementedError('Subtypes of CalendarSource must implement the getURL method')
+
+	def fetchIcal(self, begin: AdeDate, end: AdeDate) :
+		return CalendarObject.fromUrl(self.getURL(begin, end))
 	
 	def processEvent(self, obj: CalendarObject, translations: "dict[str,any]", no_translate: "list[str]") -> "CalendarObject | None" :
 		summary = obj.getProperty('SUMMARY')
