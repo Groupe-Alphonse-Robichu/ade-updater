@@ -5,32 +5,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _cleanLocation(location: str) -> str :
-	loc = [
-		" ".join(l.replace('*', ' ').replace('(V)', ' ').replace('(VPI)', ' ').strip().split(' '))
-		for l in location.split(',')
-	]
-	return ", ".join(loc)
-
-def _objTranslate(translate, obj: CalendarObject, no_translate) :
-	if obj.hasProperty('LOCATION') :
-		obj.setProperty('LOCATION', _cleanLocation(obj.getProperty('LOCATION')))
-	summary = obj.getProperty('SUMMARY')
-	if summary in translate :
-		translation = translate[summary]
-		if translation is not None :
-			obj.setProperty('SUMMARY', translation)
-	else : 
-		logger.warning(f"NOT_FOUND translation for {summary}")
-		translate[summary] = None
-		no_translate.append(summary)
-
-def filterAndTranslate(name, group, ical: CalendarObject) -> "list[str]" :
-	ignore = group['ignore']
-	translate = group['translate']
+def filterAndTranslate(cal, ical: CalendarObject) -> "list[str]" :
+	ignore = cal.getGroup().getData()['ignore']
+	translate = cal.getGroup().getData()['translate']
 	nb_ignored = ical.filterObjects(lambda obj: obj.getProperty('SUMMARY') not in ignore)
 	if nb_ignored > 0 :
-		logger.info(f"IGNORE {nb_ignored} elements from calendar {name}")
+		logger.info(f"IGNORE {nb_ignored} elements from calendar {cal.getFullName()}")
 	no_translate = []
-	ical.alterObjects(lambda obj: _objTranslate(translate, obj, no_translate))
+	ical.replaceObjects(lambda obj: cal.getSource().processEvent(obj, translate, no_translate))
 	return no_translate

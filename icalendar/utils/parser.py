@@ -55,6 +55,10 @@ class CalendarObject :
 		for obj in self._objects :
 			func(obj)
 	
+	def replaceObjects(self, func: callable) :
+		objects = [func(obj) for obj in self._objects]
+		self._objects = [x for x in objects if x is not None]
+	
 	def accumulate(self, func: callable, accumulator) :
 		res = accumulator
 		for obj in self._objects :

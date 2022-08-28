@@ -1,6 +1,7 @@
 from icalendar.translate import filterAndTranslate
 from icalendar.utils.parser import CalendarObject
 from icalendar.utils.date import AdeDate, currentWeek
+from sources.base import CalendarSource
 import sources
 
 import os
@@ -21,15 +22,21 @@ class CalendarConf :
 		self._cal = group_data['calendars'][cal_name]
 		self._source = sources.getSource(group_data['source'], group_data['conf'], self._cal['conf'])
 
+	def getSource(self) -> CalendarSource :
+		return self._source
+
 	def getStart(self) -> AdeDate :
 		return self._group.getStart()
 	
 	def getEnd(self) -> AdeDate :
 		return self._group.getEnd()
 
+	def getGroup(self) :
+		return self._group
+
 	def fetchIcal(self, start: AdeDate, end: AdeDate) -> "tuple[CalendarObject, list[str]]" :
 		ical = CalendarObject.fromUrl(self._source.getURL(start, end))
-		no_translate = filterAndTranslate(self._fullname, self._group.getData(), ical)
+		no_translate = filterAndTranslate(self, ical)
 		return ical, no_translate
 	
 	def saveIcal(self, ical: CalendarObject, name: "AdeDate | str | None") :
