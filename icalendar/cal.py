@@ -1,7 +1,7 @@
-from icalendar import SOURCES
 from icalendar.translate import filterAndTranslate
 from icalendar.utils.parser import CalendarObject
 from icalendar.utils.date import AdeDate, currentWeek
+import sources
 
 import os
 import logging
@@ -17,23 +17,21 @@ class CalendarConf :
 		self._group_name = group_name
 		self._group = group
 		self._cal = group['calendars'][cal_name]
-		self._url_template = SOURCES[group['source']]
+		if not sources.hasSource(group['source']) :
+			raise ValueError("Source %s doesn't exist", group['source'])
+		self._source = sources.getSource(group['source'], self._group['conf'], self._cal['conf'])
+		self._start = AdeDate.fromString(self._group['start'])
+		self._end = self._group['limit']
+		if self._end is None :
+			self._end = self._start.addDays(180)
 
-	def _getUrl(self, start, end) -> str :
-		url_data = {
-			'start': str(start),
-			'end': str(end),
-			'project': self._group['project_id'],
-			'resources': ",".join([str(i) for i in {*self._group['resources'], *self._cal['resources']}])
-		}
-		return self._url_template.substitute(url_data)
 	
-	def fetchIcal(self, start, end) -> "tuple[CalendarObject, list[str]]" :
-		ical = CalendarObject.fromUrl(self._getUrl(start, end))
+	def fetchIcal(self, start: AdeDate, end: AdeDate) -> "tuple[CalendarObject, list[str]]" :
+		ical = CalendarObject.fromUrl(self._source.getURL(start, end))
 		no_translate = filterAndTranslate(self._fullname, self._group, ical)
 		return ical, no_translate
 	
-	def saveIcal(self, ical: CalendarObject, name: "AdeDate | str") :
+	def saveIcal(self, ical: CalendarObject, name: "AdeDate | str | None") :
 		dest_folder = os.path.join(self._group['dest_folder'], self._name)
 		if not os.path.exists(dest_folder) :
 			logger.info(f"CREATING directory {dest_folder}")
@@ -46,12 +44,11 @@ class CalendarConf :
 		with open(dest_file, 'w') as f :
 			ical.write(f)
 	
-	def getStart(self) -> str:
-		return self._group['start']
+	def getStart(self) -> AdeDate:
+		return self._start
 	
 	def getEnd(self) -> str :
-		end = self._group['limit']
-		return end if end is not None else str(AdeDate.fromString(self._group['start']).addDays(180))
+		return self._end
 	
 	def getNotify(self) -> str :
 		return self._cal['notify']

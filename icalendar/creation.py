@@ -15,8 +15,7 @@ def createCalendarGroup(name: str) -> bool :
 		return False
 	data[name] = {
 		'source': None,
-		'project_id': None,
-		'resources': [],
+		'conf': {},
 		'dest_folder': None,
 		'start': str(AdeDate.today()),
 		'limit': None,
@@ -42,7 +41,7 @@ def createCalendar(group: str, name: str) -> bool :
 		logger.warning(f"EXISTS calendar {name} in calendar group {group}")
 		return False
 	data[group]['calendars'][name] = {
-		'resources': [],
+		'conf': {},
 		'notify': None,
 		'update': 'never',
 		'week': ''

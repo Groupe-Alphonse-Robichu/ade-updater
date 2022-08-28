@@ -31,11 +31,11 @@ def discoverAll(conf: CalendarConf, notifier: BaseNotifier, _states) -> "tuple[b
 
 
 def discoverRemaining(conf: CalendarConf, notifier: BaseNotifier, _states) -> "tuple[bool, bool, dict]" :
-	nt, ical = discoverBetweenDates(conf, notifier, str(AdeDate.today()), conf.getEnd())
+	nt, ical = discoverBetweenDates(conf, notifier, AdeDate.today(), conf.getEnd())
 	conf.saveIcal(ical, "remaining")
 	return False, False, nt
 
-def discoverBetweenDates(conf: CalendarConf, notifier: BaseNotifier, begin, end) :
+def discoverBetweenDates(conf: CalendarConf, notifier: BaseNotifier, begin: AdeDate, end: AdeDate) :
 	ical, no_translate = conf.fetchIcal(begin, end)
 	notifier.discovered(conf, ical.accumulate(discoverAccumulator, {}), begin, end)
 	return no_translate, ical
