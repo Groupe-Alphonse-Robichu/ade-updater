@@ -7,6 +7,13 @@ class CalendarSource :
 
 	def getURL(self, begin: AdeDate, end: AdeDate) -> str :
 		raise NotImplementedError('Subtypes of CalendarSource must implement the getURL method')
-
+	
 	def processEvent(self, event: CalendarObject) -> "CalendarObject | None" :
 		return event
+	
+	def defaultGlobalConf() -> "dict[str,any]" :
+		return {}
+	
+	def defaultSpecificConf() -> "dict[str,any]" :
+		return {}
+	

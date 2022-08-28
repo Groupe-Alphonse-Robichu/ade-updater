@@ -76,6 +76,9 @@ def updateAllGroups(notifier: BaseNotifier) :
 		if group.isPastLimit() :
 			_archiveGroup(group)
 			del conf[group_name]
+			del states[group_name]
+			save_conf   = True
+			save_states = True
 		else :
 			if not os.path.exists(group.getDestDir()) :
 				logger.info(f"CREATING directory {group.getDestDir()}")

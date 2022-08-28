@@ -11,28 +11,29 @@ logger = logging.getLogger(__name__)
 
 class CalendarConf :
 
-	def __init__(self, cal_name, group_name, group) :
+	def __init__(self, cal_name, group) :
+		group_name = group.getName()
+		group_data = group.getData()
 		self._name = cal_name
-		self._fullname = f"{group['source']}_{group_name}_{cal_name}"
+		self._fullname = f"{group_data['source']}_{group_name}_{cal_name}"
 		self._group_name = group_name
 		self._group = group
-		self._cal = group['calendars'][cal_name]
-		if not sources.hasSource(group['source']) :
-			raise ValueError("Source %s doesn't exist", group['source'])
-		self._source = sources.getSource(group['source'], self._group['conf'], self._cal['conf'])
-		self._start = AdeDate.fromString(self._group['start'])
-		self._end = self._group['limit']
-		if self._end is None :
-			self._end = self._start.addDays(180)
+		self._cal = group_data['calendars'][cal_name]
+		self._source = sources.getSource(group_data['source'], group_data['conf'], self._cal['conf'])
 
+	def getStart(self) -> AdeDate :
+		return self._group.getStart()
 	
+	def getEnd(self) -> AdeDate :
+		return self._group.getEnd()
+
 	def fetchIcal(self, start: AdeDate, end: AdeDate) -> "tuple[CalendarObject, list[str]]" :
 		ical = CalendarObject.fromUrl(self._source.getURL(start, end))
-		no_translate = filterAndTranslate(self._fullname, self._group, ical)
+		no_translate = filterAndTranslate(self._fullname, self._group.getData(), ical)
 		return ical, no_translate
 	
 	def saveIcal(self, ical: CalendarObject, name: "AdeDate | str | None") :
-		dest_folder = os.path.join(self._group['dest_folder'], self._name)
+		dest_folder = os.path.join(self._group.getDestDir(), self._name)
 		if not os.path.exists(dest_folder) :
 			logger.info(f"CREATING directory {dest_folder}")
 			os.mkdir(dest_folder)
@@ -44,17 +45,11 @@ class CalendarConf :
 		with open(dest_file, 'w') as f :
 			ical.write(f)
 	
-	def getStart(self) -> AdeDate:
-		return self._start
-	
-	def getEnd(self) -> str :
-		return self._end
-	
 	def getNotify(self) -> str :
 		return self._cal['notify']
 	
 	def getRoleId(self) :
-		return self._group['role_id']
+		return self._group.getData()['role_id']
 	
 	def weekChanged(self, delta=0) -> bool :
 		week = currentWeek(delta)

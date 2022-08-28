@@ -1,6 +1,5 @@
 import os
 import json
-from string import Template
 
 import logging
 

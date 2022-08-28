@@ -14,7 +14,7 @@ class BaseNotifier :
 	def archive(self, group: GroupConf) :
 		raise NotImplementedError
 
-	def discovered(self, cal: CalendarConf, event_counts: dict, begin, end) :
+	def discovered(self, cal: CalendarConf, event_counts: dict, begin: AdeDate, end: AdeDate) :
 		columns = ['Event', 'Count', 'Duration']
 		ll = [(evt, c[0], formatTimedelta(c[1])) for evt, c in event_counts.items()]
 		total_nb = 0
@@ -24,7 +24,7 @@ class BaseNotifier :
 			total_time += c[1]
 		ll.insert(0, columns)
 		ll.append(('Total', total_nb, formatTimedelta(total_time)))
-		printTable(ll, f"{cal.getFullName()} {AdeDate.fromString(begin).format()} - {AdeDate.fromString(end).format()}")
+		printTable(ll, f"{cal.getFullName()} {begin.format()} - {end.format()}")
 	
 	def weekSchedule(self, cal: CalendarConf, ical: CalendarObject, startOfWeek: AdeDate) :
 		raise NotImplementedError

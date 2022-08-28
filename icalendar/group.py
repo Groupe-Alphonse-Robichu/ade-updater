@@ -8,9 +8,21 @@ class GroupConf :
 	def __init__(self, group_name, group) :
 		self._name = group_name
 		self._group = group
+		self._start = AdeDate.fromString(group['start'])
+		self._end = group['limit']
+		if self._end is None :
+			self._end = self._start.addDays(180)
+		else :
+			self._end = AdeDate.fromString(self._end)
 	
 	def getName(self) -> str :
 		return self._name
+	
+	def getStart(self) -> AdeDate :
+		return self._start
+	
+	def getEnd(self) -> AdeDate :
+		return self._end
 	
 	def getData(self) :
 		return self._group
@@ -22,10 +34,10 @@ class GroupConf :
 		return self._group['alert']
 	
 	def isPastLimit(self) :
-		return AdeDate.today() >= AdeDate.fromString(self._group['limit'])
+		return AdeDate.today() >= self._end
 
 	def getCalendar(self, cal_name) :
-		return CalendarConf(cal_name, self._name, self._group)
+		return CalendarConf(cal_name, self)
 	
 	# func is a callable that takes three arguments :
 	#  - The configuration (`CalendarConf` object)

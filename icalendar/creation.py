@@ -1,12 +1,14 @@
 from icalendar import loadJson, saveJson, CONF_FILE
 from icalendar.utils.date import AdeDate
+from sources import getSourceClass
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def createCalendarGroup(name: str) -> bool :
+def createCalendarGroup(name: str, source_name: str) -> bool :
+	source = getSourceClass(source_name)
 	data = loadJson(CONF_FILE)
 	if '/' in name :
 		logger.warning(f"INVALID calendar group name {name}")
@@ -14,8 +16,8 @@ def createCalendarGroup(name: str) -> bool :
 		logger.warning(f"EXISTS calendar group {name}")
 		return False
 	data[name] = {
-		'source': None,
-		'conf': {},
+		'source': source_name,
+		'conf': source.defaultGlobalConf(),
 		'dest_folder': None,
 		'start': str(AdeDate.today()),
 		'limit': None,
@@ -37,11 +39,12 @@ def createCalendar(group: str, name: str) -> bool :
 	if group not in data :
 		logger.warning(f"NOT_FOUND calendar group {group}")
 		return False
+	source = getSourceClass(data[group]['source'])
 	if name in data[group]['calendars'] :
 		logger.warning(f"EXISTS calendar {name} in calendar group {group}")
 		return False
 	data[group]['calendars'][name] = {
-		'conf': {},
+		'conf': source.defaultSpecificConf(),
 		'notify': None,
 		'update': 'never',
 		'week': ''

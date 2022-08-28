@@ -21,7 +21,7 @@ class AdeDate :
 		return self._dt
 	
 	def addDays(self, delta) -> "AdeDate" :
-		return AdeDate(applyDelta(self._date, delta))
+		return AdeDate(applyDelta(self._dt, delta))
 	
 	def format(self, fmt='%d/%m/%Y') :
 		return self._dt.strftime(fmt)

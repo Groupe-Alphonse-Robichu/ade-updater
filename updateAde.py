@@ -1,20 +1,22 @@
 #!/usr/bin/python3
+import logging
+logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
+
 from icalendar.discover import discoverAllGroups, discoverAll, discoverRemaining
 from icalendar.update import updateAllGroups
 from icalendar.creation import createCalendar, createCalendarGroup
 from icalendar.notifiers.terminal import TerminalNotifier
 from icalendar.notifiers.discord import DiscordNotifier
+from sources import getSources
 
 import sys
-import logging
-
-logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
 
 def help(exit_code=0) :
 	script_name = sys.argv[0]
-	print(f"usage : {script_name} --createGroup <group_name>")
+	print(f"usage : {script_name} --createGroup <group_name> <source_name>")
 	print(f"        {script_name} --createCal <group_name> <cal_name>")
+	print(f"        {script_name} --sources")
 	print(f"        {script_name} [-n] --update")
 	print(f"        {script_name} [-n] --all")
 	print(f"        {script_name} [-n] --remaining")
@@ -49,10 +51,15 @@ if __name__ == '__main__' :
 		discoverAllGroups(discoverRemaining, notifier)
 		sys.exit(0)
 	
+	if args[0] == '--sources' :
+		for source in getSources() :
+			print(source)
+		sys.exit(0)
+
 	if args[0] == '--createGroup' :
-		if len(args) < 2 :
+		if len(args) < 3 :
 			help(1)
-		sys.exit(0 if createCalendarGroup(args[1]) else 1)
+		sys.exit(0 if createCalendarGroup(args[1], args[2]) else 1)
 		
 	
 	if args[0] == '--createCal' :
