@@ -1,33 +1,48 @@
 
 from sources.base import CalendarSource
 from sources.custom import register
-from icalendar.utils.date import AdeDate, IcalDate
+from icalendar.utils.date import AdeDate
 from icalendar.utils.parser import CalendarObject
 
 import re
+import string
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 course_code_reg = re.compile(r'Course code: ([A-Z0-9]+)')
 
-URL_FIELD = 'url'
+URL_TEMPLATE = string.Template('https://cloud.timeedit.net/ltu/web/schedule1/ri.ics?sid=${sid}&p=${begin}-${end}&objects=${objects}&e=${e}&enol=t')
+DATE_FORMAT  = '%Y%m%d'
+E_DATE_FORMAT  = '%y%m%d'
+
+SID_FIELD = 'sid'
+OBJECTS_FIELD = 'objects'
 
 
 class LUTSource(CalendarSource) :
 
 	def __init__(self, global_conf: "dict[str,any]", specific_conf: "dict[str,any]") :
-		if URL_FIELD not in specific_conf :
-			raise KeyError('field %s not found in configuration for LUTSource', URL_FIELD)
-		self.url = specific_conf[URL_FIELD]
+		for field in [SID_FIELD, OBJECTS_FIELD] :
+			if field not in specific_conf :
+				raise KeyError(f"field {field} not found in configuration for LUTSource")
+		self.sid = specific_conf[SID_FIELD]
+		self.objects = specific_conf[OBJECTS_FIELD]
 
 	def fetchIcal(self, begin: AdeDate, end: AdeDate) :
 		res = super().fetchIcal(begin, end)
 		res.filterObjects(lambda obj: _dateFilter(obj, begin, end))
 		return res
 
-	def getURL(self, _begin: AdeDate, _end: AdeDate) -> str:
-		return self.url
+	def getURL(self, begin: AdeDate, end: AdeDate) -> str:
+		return URL_TEMPLATE.substitute(
+			sid = self.sid,
+			objects = self.objects,
+			e = datetime.now().strftime(E_DATE_FORMAT),
+			begin = begin.format(DATE_FORMAT),
+			end = end.format(DATE_FORMAT)
+		)
 
 	def processEvent(self, obj: CalendarObject, translations: "dict[str,any]", no_translate: "list[str]") -> "CalendarObject | None" :
 		if obj.hasProperty('LOCATION') :
@@ -54,7 +69,7 @@ class LUTSource(CalendarSource) :
 		return obj
 	
 	def defaultSpecificConf() -> "dict[str,any]" :
-		return { URL_FIELD: None }
+		return { SID_FIELD: None, OBJECTS_FIELD: None }
 
 
 register(LUTSource, 'ltu')
